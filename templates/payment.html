@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>إتمام عملية الدفع</title>
+    <link rel="stylesheet" href="https://cdn.moyasar.com/mpf/1.13.0/moyasar.css" />
+    <script src="https://cdn.moyasar.com/mpf/1.13.0/moyasar.js"></script>
+</head>
+<body style="background: #1a1a1a; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+
+    <div style="background: white; padding: 20px; border-radius: 15px; width: 100%; max-width: 400px;">
+        <h2 style="text-align: center; color: #333;">بوابة الدفع - بكسل كرافت</h2>
+        <div class="mysr-form"></div>
+    </div>
+<script>
+  // تأكدي أن السطر التالي يستخدم pk_test وليس pk_live
+  Moyasar.init({
+    element: '.mysr-form',
+    amount: {{ amount }}, 
+    currency: 'SAR',
+    description: 'شحن نقاط بكسل كرافت',
+    publishable_api_key: 'pk_test_PVnbsZh9VfKX8ibnEQSAEgKp2N4w6akSC85EZXdr',
+    callback_url: 'http://127.0.0.1:5000/success',
+    methods: ['creditcard']  });
+</script>
+</body>
+</html>
