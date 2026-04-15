@@ -72,31 +72,44 @@ def signup():
         db.session.commit()
         return redirect(url_for('login'))
     return render_template('signup.html')
-
+    
 @app.route('/generate', methods=['POST'])
 @login_required
 def generate():
-    if current_user.credits <= 0:
-        return jsonify({"text": "❌ انتهت نقاطك المجانية! يرجى شراء باقة جديدة."})
-    
-    user_data = request.json.get('prompt')
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "أنت كاتب محترف يحول النقاط إلى مقال."},
-                {"role": "user", "content": user_data}
-            ]
-        )
-        current_user.credits -= 1
-        db.session.commit()
-        
-        return jsonify({
-            "text": response.choices[0].message.content,
-            "new_credits": current_user.credits
-        })
-    except Exception as e:
-        return jsonify({"text": f"خطأ: {str(e)}"})
+if current_user.credits <= 0:
+return jsonify({"text": "❌ انتهت نقاطك المجانية! يرجى شراء باقة جديدة."})
+
+user_data = request.json.get('prompt')
+try:
+response = openai.ChatCompletion.create(
+model="gpt-4o-mini", # تم التحديث لنموذج أحدث وأفضل للمقالات الطويلة
+messages=[
+{
+"role": "system",
+"content": (
+"أنت كاتب محترف وخبير في كتابة المقالات الطويلة (Long-form content). "
+"يجب أن يكون المقال مفصلاً جداً، غنياً بالمعلومات، ويحتوي على مقدمة، "
+"عناوين فرعية جذابة، فقرات شرح عميقة، وخاتمة. "
+"استهدف كتابة ما يقارب 1500 كلمة."
+)
+},
+{"role": "user", "content": f"اكتب مقالاً شاملاً ومفصلاً عن: {user_data}"}
+],
+max_tokens=3000, # رفع الحد للسماح بكتابة مقال طويل (الـ 1500 كلمة تساوي تقريباً 2000-2500 توكن)
+temperature=0.7 # درجة إبداع مناسبة لكتابة المقالات
+)
+
+current_user.credits -= 1
+db.session.commit()
+
+return jsonify({
+"text": response.choices[0].message.content,
+"new_credits": current_user.credits
+})
+except Exception as e:
+return jsonify({"text": f"خطأ: {str(e)}"})
+
+
 
 @app.route('/plans')
 @login_required
